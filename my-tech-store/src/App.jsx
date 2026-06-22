@@ -1,122 +1,100 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState } from "react";
+import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0)
+const productsData = [
+  { id: 1, name: "Mechanical Keyboard", price: 2500, emoji: "⌨️" },
+  { id: 2, name: "Wireless Mouse", price: 800, emoji: "🖱️" },
+  { id: 3, name: "Noise Cancelling Headphones", price: 3500, emoji: "🎧" },
+  { id: 4, name: "Ergonomic Chair", price: 5000, emoji: "🪑" },
+  { id: 5, name: "27-inch Monitor", price: 12000, emoji: "🖥️" },
+  { id: 6, name: "Desk Mat", price: 400, emoji: "⬛" },
+];
+
+export default function App() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [cart, setCart] = useState([]);
+
+  const filteredProducts = productsData.filter((product) =>
+    product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const addToCart = (product) => {
+    setCart([...cart, product]);
+  };
+
+  const removeFromCart = (indexToRemove) => {
+    setCart(cart.filter((_, index) => index !== indexToRemove));
+  };
+
+  const cartTotal = cart.reduce((total, item) => total + item.price, 0);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="app-container">
+      <nav className="navbar">
+        <h2>TechShop</h2>
+        <input
+          type="text"
+          placeholder="Search products..."
+          className="search-bar"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)} 
+        />
+        <div className="cart-icon">🛒 Cart ({cart.length})</div>
+      </nav>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+      <div className="main-layout">
+        <div className="products-section">
+          <h3>Our Products</h3>
+          <div className="products-grid">
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map((product) => (
+                <div key={product.id} className="product-card">
+                  <div className="product-emoji">{product.emoji}</div>
+                  <h4>{product.name}</h4>
+                  <p>₹{product.price}</p>
+                  <button 
+                    className="add-btn"
+                    onClick={() => addToCart(product)}
+                  >
+                    Add to Cart
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p>No products found matching "{searchQuery}"</p>
+            )}
+          </div>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        <div className="cart-sidebar">
+          <h3>Your Cart</h3>
+          {cart.length === 0 ? (
+            <p>Your cart is empty.</p>
+          ) : (
+            <>
+              <ul className="cart-list">
+                {cart.map((item, index) => (
+                  <li key={index} className="cart-item">
+                    <span>{item.name} - ₹{item.price}</span>
+                    <button 
+                      className="remove-btn"
+                      onClick={() => removeFromCart(index)}
+                    >
+                      X
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <div className="cart-total">
+                <strong>Total: ₹{cartTotal}</strong>
+              </div>
+              <button className="checkout-btn" onClick={() => alert("Checkout successful!")}>
+                Checkout
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
-
-export default App
